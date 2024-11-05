@@ -1,12 +1,12 @@
 import { createContext, useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { httpStatus } from 'http-status';
+import { httpStatus } from "http-status";
 
 export const AuthContext = createContext({});
 
 const client = axios.create({
-  baseURL: "localhost:8000/api/vi/user",
+  baseURL: "http://localhost:8000/api/v1/user",
 });
 
 export const AuthProvider = ({ children }) => {
@@ -14,23 +14,26 @@ export const AuthProvider = ({ children }) => {
 
   const [userData, setUserData] = useState(authContext);
 
+  const router = useNavigate();
+
   const handleRegister = async (name, username, password) => {
     // eslint-disable-next-line no-useless-catch
     try {
-      const request = await client.post("/register", {
+      let request = await client.post("/register", {
         name,
         username,
         password,
       });
       if (request.status === httpStatus.CREATED) {
+        console.log("Registration successful:", request.data);
         return request.data.message;
       }
     } catch (err) {
-      throw err; 
+      throw err;
     }
   };
 
-  const handleLogin = async ( username, password) => {
+  const handleLogin = async (username, password) => {
     // eslint-disable-next-line no-useless-catch
     try {
       const request = await client.post("/login", {
@@ -38,25 +41,19 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       if (request.status === httpStatus.OK) {
-    localStorage.setItem("token", request.data.token)
+        localStorage.setItem("token", request.data.token);
       }
     } catch (err) {
-      throw err; 
+      throw err;
     }
   };
 
-  const router = useNavigate();
-
   const data = {
-   userData,
-   setUserData,
-   handleRegister,
-   handleLogin
+    userData,
+    setUserData,
+    handleRegister,
+    handleLogin,
   };
 
-  return(
-    <AuthContext.Provider value={data}>
-        {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
 };
