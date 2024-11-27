@@ -11,8 +11,11 @@ const server = createServer(app);
 const io = connectToSocket(server);
 dotenv.config();
 
+
 app.set("port", 8000);
-app.use(cors());
+
+app.use(cors()); // Apply CORS options
+
 app.use(express.json({ Limit: "40kb" }));
 app.use(express.urlencoded({ Limit: "40kb", extended: true }));
 
